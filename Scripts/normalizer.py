@@ -30,9 +30,9 @@ def normalizar(columna, df):
     max = df[columna].max()
     df[columna] = (df[columna] - min) / (max - min)
 
-df = read_file('zeus-init.csv')
+df = read_file('C:/Users/kevin/AppData/Roaming/MetaQuotes/Terminal/Common/Files/zeus-init.csv')
 
 # Normalizamos
 normalizar('CD', df)
 normalizar('CT', df)
-df.to_csv('zeus-init-normalizado.csv', index=False)
+df.to_csv('C:/Users/kevin/AppData/Roaming/MetaQuotes/Terminal/Common/Files/zeus-init-normalizado.csv', index=False)
