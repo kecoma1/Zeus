@@ -20,6 +20,8 @@ def read_file(filename):
 def normalizar(column, df):
     min = df[column].min()
     max = df[column].max()
+    print(column, 'mínimo', min)
+    print(column, 'máximo', max)
     df[column] = (df[column] - min) / (max - min)
             
 filename = 'zeus-init'
