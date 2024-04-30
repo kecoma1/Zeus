@@ -1,16 +1,16 @@
 #include <NN.mqh>
 #include <Relativo.mqh>
-ColaRelativos relativos;
 
-input string NOMBRE_MODELO = "";
+input string FILENAME = "zeus.txt";
 input int PROFUNDIDAD = 10;
 input int NUM_RELATIVOS = 10;
 input TipoBusqueda TIPO_BUSQUEDA = HIGHLOW;
-input double MAX_CD;
-input double MAX_CT;
 input double MIN_CD;
-input double MIN_CT;
+input double MAX_CD;
+input int MIN_CT;
+input int MAX_CT;
 
+ColaRelativos relativos;
 RedNeuronal *rn;
 
 double sigmoide(double v) {
@@ -22,27 +22,32 @@ double derivada_sigmoide(double v) {
 }
 
 void dibujar_prediccion(vector &atributos) {
-   string name = "prediccion";
-   
    vector resultado = rn.predecir(atributos);
-   Print("RESULTADO: ", resultado);
    
-   Relativo rel = relativos.get_last_relativo();
-   double price = ((resultado[0]*(MAX_CD-MIN_CD))+MIN_CD)*rel.price;
-   int tiempo = (int)((resultado[1]*(MAX_CT-MIN_CT))+MIN_CT);
+   Relativo ultimo_relativo = relativos.get_last_relativo();
    
-   Print(price);
-   Print(tiempo);
+   double precio = ((resultado[0] * (MAX_CD - MIN_CD)) + MIN_CD) * ultimo_relativo.price;
+   int tiempo = (int)(resultado[1] * (MAX_CT - MIN_CT)) + MIN_CT;
+   Print(tiempo, " ", precio);
    
-   ObjectCreate(0, name, OBJ_TREND, 0, rel.time, rel.price, rel.time+tiempo, price);
+   string name = "prediccion";
+   ObjectCreate(
+      0,
+      name,
+      OBJ_TREND,
+      0,
+      ultimo_relativo.time,
+      ultimo_relativo.price,
+      ultimo_relativo.time+tiempo,
+      precio
+   );
    ObjectSetInteger(0, name, OBJPROP_COLOR, clrGreenYellow);
-   ObjectSetInteger(0, name, OBJPROP_WIDTH, 6);
+   ObjectSetInteger(0, name, OBJPROP_WIDTH, 3);
 }
 
-
 void OnInit() {
-   rn = new RedNeuronal(NOMBRE_MODELO, sigmoide, derivada_sigmoide, 1);
-   
+   rn = new RedNeuronal(FILENAME, sigmoide, derivada_sigmoide, 1);
+
    relativos.buscar_relativos(PROFUNDIDAD, NUM_RELATIVOS+1, _Symbol, _Period, TIPO_BUSQUEDA);
    relativos.dibujar_lineas(_Symbol, _Period);
    
@@ -53,12 +58,13 @@ void OnDeinit(const int reason) {
    delete(rn);
 }
 
-
 void OnTimer() {
    bool resultado = relativos.buscar_nuevos_relativos(PROFUNDIDAD, _Symbol, _Period, TIPO_BUSQUEDA);
    relativos.dibujar_lineas(_Symbol, _Period);
-   MqlRates velas[];
-   CopyRates(_Symbol, _Period, 0, NUM_RELATIVOS*200, velas);
-   vector atributos = relativos.toNNVector(NUM_RELATIVOS, velas);
-   if (resultado) dibujar_prediccion(atributos);
+   if (resultado) {
+      MqlRates velas[];
+      CopyRates(_Symbol, _Period, 0, 200*NUM_RELATIVOS, velas);
+      vector atributos = relativos.toNNVector(NUM_RELATIVOS, velas);
+      dibujar_prediccion(atributos);
+   }
 }
