@@ -13,6 +13,8 @@ input int MAX_CT;
 ColaRelativos relativos;
 RedNeuronal *rn;
 
+int num_prediccion = 0;
+
 double sigmoide(double v) {
    return 1/(1+MathPow(2.71828, v*-1));
 }
@@ -22,15 +24,16 @@ double derivada_sigmoide(double v) {
 }
 
 void dibujar_prediccion(vector &atributos) {
+   
    vector resultado = rn.predecir(atributos);
    
    Relativo ultimo_relativo = relativos.get_last_relativo();
    
    double precio = ((resultado[0] * (MAX_CD - MIN_CD)) + MIN_CD) * ultimo_relativo.price;
    int tiempo = (int)(resultado[1] * (MAX_CT - MIN_CT)) + MIN_CT;
-   Print(tiempo, " ", precio);
    
-   string name = "prediccion";
+   string name = "prediccion"+IntegerToString(num_prediccion);
+   num_prediccion++;
    ObjectCreate(
       0,
       name,
@@ -62,9 +65,7 @@ void OnTimer() {
    bool resultado = relativos.buscar_nuevos_relativos(PROFUNDIDAD, _Symbol, _Period, TIPO_BUSQUEDA);
    relativos.dibujar_lineas(_Symbol, _Period);
    if (resultado) {
-      MqlRates velas[];
-      CopyRates(_Symbol, _Period, 0, 200*NUM_RELATIVOS, velas);
-      vector atributos = relativos.toNNVector(NUM_RELATIVOS, velas);
+      vector atributos = relativos.get_zeus_atributos(NUM_RELATIVOS);
       dibujar_prediccion(atributos);
    }
 }

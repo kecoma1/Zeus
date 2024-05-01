@@ -43,6 +43,7 @@ class ColaRelativos {
       Relativo get_last_relativo();
       void reset();
       vector toNNVector(int size, MqlRates &_velas[]);
+      vector get_zeus_atributos(int size);
       bool set_relativo(
          MqlRates &_velas[],
          int i,
@@ -103,6 +104,21 @@ vector ColaRelativos::toNNVector(int size, MqlRates &_velas[]) {
       }
       result.Set((i+1)*2, diff_precio);
       result.Set(((i+1)*2)+1, diff_time);
+   }
+   return result;
+}
+
+vector ColaRelativos::get_zeus_atributos(int size) {
+   vector result(size*2);
+   int num_relativos = ArraySize(this.relativos);
+
+   for (int i = num_relativos-1, n = 0; i >= num_relativos-size; i--, n++) {
+      double diff_precio = 0;
+      long diff_time = 0;
+      diff_precio = this.relativos[i].price/this.relativos[i-1].price;
+      diff_time = this.relativos[i].time-this.relativos[i-1].time;
+      result.Set(n*2, diff_precio);
+      result.Set((n*2)+1, diff_time);
    }
    return result;
 }
