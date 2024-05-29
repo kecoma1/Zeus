@@ -1,5 +1,5 @@
 #include <NN.mqh>
-#include <Relativo.mqh>
+#include <zeus-yt/Relativo.mqh>
 #include <Trade/Trade.mqh>
 CTrade trade;
 
@@ -77,7 +77,7 @@ void OnTimer() {
    bool resultado = relativos.buscar_nuevos_relativos(PROFUNDIDAD, _Symbol, _Period, TIPO_BUSQUEDA);
    relativos.dibujar_lineas(_Symbol, _Period);
    if (resultado) {
-      vector atributos = relativos.get_atributos_zeus(NUM_RELATIVOS);
+      vector atributos = relativos.get_zeus_atributos(NUM_RELATIVOS);
       dibujar_prediccion(atributos);
    }
 }

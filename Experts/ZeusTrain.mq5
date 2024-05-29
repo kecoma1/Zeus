@@ -1,4 +1,4 @@
-#include <Athena/File.mqh>
+#include <zeus-yt/File.mqh>
 #include <NN.mqh>
 
 
@@ -26,5 +26,5 @@ void OnInit() {
    matrix clases = cargar_clases_csv(FILENAME_DATOS, 2);
    Print("-------- Entrenando la red neuronal de compra -------- ");
    rn.entrenar(EPOCAS, atributos, clases, true);
-   rn.guardar(FILENAME_MODELO, ENTRADAS+",64,64,2");
+   rn.guardar(FILENAME_MODELO, IntegerToString(ENTRADAS)+",64,64,2");
 }
